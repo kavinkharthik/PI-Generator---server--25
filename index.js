@@ -4,6 +4,7 @@ import multer from "multer";
 import dotenv from "dotenv";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { TransactionalEmailsApi, SendSmtpEmail } from "@getbrevo/brevo";
+import qrcode from "qrcode";
 
 dotenv.config();
 
@@ -40,7 +41,7 @@ const fieldBoxes = {
 const tableConfig = {
   startX: 40,
   startY: 430,
-  rowHeight: 16,
+  rowHeight: 18,
   maxRows: 10,
   columns: {
     sNo: { x: 48, width: 25, align: "center" },
@@ -116,6 +117,31 @@ function drawMultilineBox(page, font, text, fontSize, box) {
   });
 }
 
+// Helper for currency conversion
+function numberToWords(n) {
+  if (n < 0) return "Minus " + numberToWords(-n);
+  if (n === 0) return "Zero";
+
+  const a = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+  const b = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+  function inWords(num) {
+    if ((num = num.toString()).length > 9) return "overflow";
+    const n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+    if (!n) return "";
+    let str = "";
+    str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + ' Crore ' : '';
+    str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + ' Lakh ' : '';
+    str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + ' Thousand ' : '';
+    str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + ' Hundred ' : '';
+    str += (n[5] != 0) ? ((str != '') ? '' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
+    return str;
+  }
+
+  return inWords(n) + " Rupees Only";
+}
+
+
 // Generate PDF from scratch matching SRI CHAKRI TRADERS format
 async function generateProformaInvoice(payload) {
   const pdfDoc = await PDFDocument.create();
@@ -124,21 +150,130 @@ async function generateProformaInvoice(payload) {
 
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const italicFont = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+
   const fontSize = 10;
   const smallFontSize = 8;
   const headerFontSize = 20;
 
-  // Green header band
+  // Add a professional border around the entire document
+  page.drawRectangle({
+    x: 10,
+    y: 10,
+    width: width - 20,
+    height: height - 10 - 50, // Leave space for footer
+    borderColor: rgb(0.5, 0.5, 0.5),
+    borderWidth: 1,
+  });
+
+  // Professional blue header band
   const headerHeight = 120;
-  const greenColor = rgb(0.2, 0.6, 0.3); // Green color
-  const yellowColor = rgb(1, 1, 0.2); // Yellow color for text
+  const blueColor = rgb(0.1, 0.3, 0.6); // Professional blue color
+  const lightBlueColor = rgb(0.7, 0.85, 0.95); // Light blue for accents
   const whiteColor = rgb(1, 1, 1); // White color
+  const darkBlueColor = rgb(0.05, 0.2, 0.4); // Dark blue for text
   const logoBox = {
     x: 20,
     y: height - headerHeight + 15,
     width: 90,
     height: 90,
   };
+
+  async function drawQrCodeIfPresent() {
+    let qrBytes;
+    let qrExt = 'png';
+
+    const logDebug = (msg) => {
+      try { fs.appendFileSync("qr_debug.log", new Date().toISOString() + ": " + msg + "\n"); } catch (e) { }
+    };
+
+    logDebug("Starting drawQrCodeIfPresent");
+
+    // Check for custom QR code image first
+    try {
+      const assetPath = "assets/qrcode.png";
+      if (fs.existsSync(assetPath)) {
+        qrBytes = fs.readFileSync(assetPath);
+        qrExt = 'png';
+        logDebug("Using custom QR code from assets/qrcode.png");
+      }
+    } catch (e) {
+      console.error("Failed to load custom QR code", e);
+      logDebug("Exception loading custom QR: " + e.message);
+    }
+
+    if (!qrBytes && payload.qrCodeDataUrl) {
+      logDebug("Payload has qrCodeDataUrl");
+      const match = String(payload.qrCodeDataUrl).match(
+        /^data:image\/(png|jpeg|jpg);base64,(.+)$/i
+      );
+      if (match) {
+        qrExt = match[1];
+        qrBytes = Uint8Array.from(Buffer.from(match[2], "base64"));
+        logDebug("Parsed QR code from payload");
+      } else {
+        logDebug("Failed to parse qrCodeDataUrl pattern");
+      }
+    } else if (!qrBytes) {
+      logDebug("Payload does NOT have qrCodeDataUrl");
+    }
+
+    // Generate QR code if no custom image
+    if (!qrBytes) {
+      try {
+        const total = payload.items ? payload.items.reduce((sum, item) => sum + (parseFloat(item.rate || '0') * parseFloat(item.quantity || '0')), 0) : 0;
+        const upiData = `upi://pay?pa=merchant@upi&pn=SRI CHAKRI TRADERS&am=${total.toFixed(2)}&cu=INR&tn=Invoice ${payload.poNumber || ''}`;
+        const qrDataUrl = await qrcode.toDataURL(upiData, { type: 'image/png', errorCorrectionLevel: 'M' });
+        const match = qrDataUrl.match(/^data:image\/png;base64,(.+)$/);
+        if (match) {
+          qrBytes = Uint8Array.from(Buffer.from(match[1], "base64"));
+          qrExt = 'png';
+          logDebug("Generated UPI QR code for payment");
+        }
+      } catch (e) {
+        console.error("Failed to generate QR code", e);
+        logDebug("Exception generating QR: " + e.message);
+      }
+    }
+
+    if (!qrBytes) {
+      console.log("No QR bytes to draw.");
+      logDebug("No QR bytes found. Aborting.");
+      return;
+    }
+
+    try {
+      let img;
+      if (qrExt.toLowerCase() === "png") {
+        img = await pdfDoc.embedPng(qrBytes);
+      } else {
+        img = await pdfDoc.embedJpg(qrBytes);
+      }
+
+      // Position QR code near signature (bottom right area)
+      const qrBoxSize = 120;
+      const qrX = width - 200 - qrBoxSize - 20; // Left of signature
+      // Align bottom of QR with bottom of signature text approx
+      const qrY = 70; // Just above pink footer
+
+      const { width: iw, height: ih } = img.scaleToFit(qrBoxSize, qrBoxSize);
+      page.drawImage(img, { x: qrX, y: qrY, width: iw, height: ih });
+      logDebug("Drew QR code image");
+
+      page.drawText("Scan & Pay", {
+        x: qrX + (iw / 2) - 25,
+        y: qrY - 10,
+        size: 8,
+        font: boldFont,
+        color: rgb(0, 0, 0)
+      });
+      logDebug("Drew Scan & Pay text");
+
+    } catch (e) {
+      console.error("Error drawing QR code:", e);
+      logDebug("Error drawing QR code: " + e.message);
+    }
+  }
 
   async function drawLogoIfPresent() {
     if (!payload.logoDataUrl) return;
@@ -165,18 +300,18 @@ async function generateProformaInvoice(payload) {
     y: height - headerHeight,
     width: width,
     height: headerHeight,
-    color: greenColor,
+    color: blueColor,
   });
 
-  // Logo area (left side of green band)
+  // Logo area (left side of blue band)
   page.drawRectangle({
     x: logoBox.x,
     y: logoBox.y,
     width: logoBox.width,
     height: logoBox.height,
-    borderColor: yellowColor,
+    borderColor: lightBlueColor,
     borderWidth: 2,
-    color: rgb(0.9, 0.9, 0.9),
+    color: whiteColor,
   });
   await drawLogoIfPresent();
 
@@ -191,7 +326,7 @@ async function generateProformaInvoice(payload) {
     y: currentY,
     size: headerFontSize,
     font: boldFont,
-    color: yellowColor,
+    color: whiteColor,
   });
 
   // Address
@@ -202,7 +337,7 @@ async function generateProformaInvoice(payload) {
     y: currentY,
     size: fontSize,
     font: font,
-    color: yellowColor,
+    color: whiteColor,
     maxWidth: textMaxWidth,
   });
 
@@ -214,7 +349,7 @@ async function generateProformaInvoice(payload) {
     y: currentY,
     size: fontSize,
     font: font,
-    color: yellowColor,
+    color: whiteColor,
   });
 
   // Email
@@ -225,20 +360,20 @@ async function generateProformaInvoice(payload) {
     y: currentY,
     size: fontSize,
     font: font,
-    color: yellowColor,
+    color: whiteColor,
   });
 
-  // GST Number on right side of green band
+  // GST Number on right side of blue band
   const gstText = "GST No.: 33DMSPD3047K1ZV";
   page.drawText(gstText, {
     x: width - 30 - font.widthOfTextAtSize(gstText, fontSize),
     y: height - 50,
     size: fontSize,
     font: font,
-    color: yellowColor,
+    color: whiteColor,
   });
 
-  // PERFORMA INVOICE box in green band
+  // PERFORMA INVOICE box in blue band
   const invoiceBoxY = height - headerHeight + 10;
   const invoiceBoxHeight = 25;
   page.drawRectangle({
@@ -248,7 +383,7 @@ async function generateProformaInvoice(payload) {
     height: invoiceBoxHeight,
     borderColor: whiteColor,
     borderWidth: 1.5,
-    color: greenColor,
+    color: blueColor,
   });
   page.drawText("PERFORMA INVOICE", {
     x: width - 145,
@@ -313,7 +448,7 @@ async function generateProformaInvoice(payload) {
   const tableTopY = currentY + 15;
   const tableHeaderHeight = 20;
 
-  // Table headers with borders
+  // Table headers with borders and background
   const headers = ["S.No.", "Particulars", "HSN CODE", "D.C. No.", "Rate Rs.", "Quantity", "Amount"];
   let headerX = tableStartX;
 
@@ -325,6 +460,7 @@ async function generateProformaInvoice(payload) {
     height: tableHeaderHeight,
     borderColor: rgb(0, 0, 0),
     borderWidth: 1,
+    color: lightBlueColor, // Light blue background for header
   });
 
   // Draw vertical lines for columns
@@ -372,6 +508,9 @@ async function generateProformaInvoice(payload) {
     const amount = rate * qty;
     total += amount;
 
+    // Alternating row colors
+    const rowColor = index % 2 === 0 ? rgb(0.95, 0.95, 0.95) : whiteColor; // Light gray for even rows
+
     // Draw row border
     page.drawRectangle({
       x: tableStartX,
@@ -380,6 +519,7 @@ async function generateProformaInvoice(payload) {
       height: rowHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 0.5,
+      color: rowColor,
     });
 
     // Draw vertical lines
@@ -430,6 +570,9 @@ async function generateProformaInvoice(payload) {
   // Draw empty rows if needed
   const emptyRows = maxRows - items.length;
   for (let i = 0; i < emptyRows && currentY > 280; i++) {
+    const rowIndex = items.length + i;
+    const rowColor = rowIndex % 2 === 0 ? rgb(0.95, 0.95, 0.95) : whiteColor;
+
     page.drawRectangle({
       x: tableStartX,
       y: currentY - rowHeight,
@@ -437,6 +580,7 @@ async function generateProformaInvoice(payload) {
       height: rowHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 0.5,
+      color: rowColor,
     });
 
     let colX = tableStartX;
@@ -499,10 +643,46 @@ async function generateProformaInvoice(payload) {
     y: rupeesFieldY - rupeesFieldHeight,
     width: rupeesFieldWidth,
     height: rupeesFieldHeight,
-    borderColor: rgb(0, 0, 0),
+    borderColor: rgb(0.8, 0.8, 0.8),
     borderWidth: 1,
   });
-  page.drawText("Rupees", { x: rupeesFieldX + 5, y: rupeesFieldY - 15, size: smallFontSize, font: boldFont });
+
+  // Decorative header for Rupees box
+  page.drawRectangle({
+    x: rupeesFieldX,
+    y: rupeesFieldY - 25,
+    width: rupeesFieldWidth,
+    height: 25,
+    color: rgb(0.9, 0.9, 0.9), // Slightly darker gray for header
+  });
+
+  const rupeesLabel = "Amount Chargeable (in words):";
+  page.drawText(rupeesLabel, { x: rupeesFieldX + 5, y: rupeesFieldY - 17, size: smallFontSize, font: boldFont });
+
+  const rupeesText = numberToWords(roundedGrand);
+
+  // Use italic font if available, else standard font
+  const wordFont = (typeof italicFont !== 'undefined') ? italicFont : font;
+
+  drawMultilineBox(page, wordFont, rupeesText, smallFontSize, {
+    x: rupeesFieldX + 5,
+    y: rupeesFieldY - 80, // Bottom of the box area
+    width: rupeesFieldWidth - 10,
+    height: 50, // Available height in the white part
+    lineHeight: 12,
+    maxLines: 4
+  });
+
+
+  // Footer terms - left side
+  // Increase spacing from current Y to footer terms
+  // currentY was calculated earlier, but let's reset it relative to the lowest element (Rupees box or Totals)
+
+  const rupeesBoxBottomY = rupeesFieldY - rupeesFieldHeight;
+  const totalsBoxBottomY = totalsStartY - totalsHeight;
+  const lowestBoxY = Math.min(rupeesBoxBottomY, totalsBoxBottomY);
+
+  const calculatedFooterY = lowestBoxY - 30; // 30px gap
 
   let totalsY = totalsStartY - 15;
   const labelX = totalsStartX + 5;
@@ -556,7 +736,7 @@ async function generateProformaInvoice(payload) {
   currentY = totalsStartY - totalsHeight - 20;
 
   // Footer terms - left side
-  const footerY = currentY;
+  const footerY = calculatedFooterY;
   const terms = [
     "• Payments are to be made by A/C Payee's cheque or DD payable at Tirupur",
     "• Claims of any nature whatsoever will lapse unless raised in writing within 5 days from the date of invoice",
@@ -564,10 +744,40 @@ async function generateProformaInvoice(payload) {
     "• Subject to Tirupur Jurisdiction.",
   ];
 
+  // Header for terms
+  page.drawText("Terms & Conditions:", {
+    x: 50,
+    y: footerY + 15, // Slightly above the terms
+    size: smallFontSize + 1,
+    font: boldFont,
+    underline: true
+  });
+
   let footerYPos = footerY;
+  const footerTermsWidth = width - 250; // Wrap before hitting the signature block (approx 200px from right)
+
   terms.forEach((term) => {
-    page.drawText(term, { x: 50, y: footerYPos, size: smallFontSize, font: font });
-    footerYPos -= 15;
+    // Manually wrap text
+    const words = term.split(" ");
+    let line = "";
+    const lines = [];
+    for (const w of words) {
+      const testLine = line + w + " ";
+      const metrics = font.widthOfTextAtSize(testLine, smallFontSize);
+      if (metrics > footerTermsWidth && line !== "") {
+        lines.push(line);
+        line = w + " ";
+      } else {
+        line = testLine;
+      }
+    }
+    lines.push(line);
+
+    lines.forEach((l) => {
+      page.drawText(l.trim(), { x: 50, y: footerYPos, size: smallFontSize, font: font });
+      footerYPos -= 12; // Line height
+    });
+    footerYPos -= 3; // Extra space between terms
   });
 
   // Signature - right side
@@ -575,9 +785,12 @@ async function generateProformaInvoice(payload) {
   page.drawText("T.J. DURGA", { x: width - 200, y: footerY - 15, size: smallFontSize, font: font });
   page.drawText("Authorised Signatory", { x: width - 200, y: footerY - 30, size: smallFontSize, font: font });
 
-  // Pink footer band
-  const pinkColor = rgb(1, 0.75, 0.8); // Pink color
-  const magentaColor = rgb(0.8, 0, 0.5); // Magenta color for text
+  // Draw QR Code
+  await drawQrCodeIfPresent();
+
+  // Professional gray footer band
+  const grayColor = rgb(0.9, 0.9, 0.9); // Light gray color
+  const darkGrayColor = rgb(0.3, 0.3, 0.3); // Dark gray for text
   const footerHeight = 50;
 
   page.drawRectangle({
@@ -585,14 +798,14 @@ async function generateProformaInvoice(payload) {
     y: 0,
     width: width,
     height: footerHeight,
-    color: pinkColor,
+    color: grayColor,
   });
 
-  // Additional note in pink footer
+  // Additional note in gray footer
   const noteY = 35;
-  page.drawText("FOR YOUR KIND ATTENTION:", { x: 30, y: noteY, size: smallFontSize, font: boldFont, color: magentaColor });
-  page.drawText("payment must be within 30 days from the despatch day.( Pay by cheque)", { x: 30, y: noteY - 15, size: smallFontSize, font: font, color: magentaColor });
-  page.drawText("AFTER RECEIVING THE PI , PLEASE SEND POST DATED CHEQUE", { x: 30, y: noteY - 30, size: smallFontSize, font: font, color: magentaColor });
+  page.drawText("FOR YOUR KIND ATTENTION:", { x: 30, y: noteY, size: smallFontSize, font: boldFont, color: darkGrayColor });
+  page.drawText("payment must be within 30 days from the despatch day.( Pay by cheque)", { x: 30, y: noteY - 15, size: smallFontSize, font: font, color: darkGrayColor });
+  page.drawText("AFTER RECEIVING THE PI , PLEASE SEND POST DATED CHEQUE", { x: 30, y: noteY - 30, size: smallFontSize, font: font, color: darkGrayColor });
 
   return await pdfDoc.save();
 }

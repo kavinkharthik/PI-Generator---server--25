@@ -1,0 +1,166 @@
+2025-12-25T12:55:42.871Z: Starting drawQrCodeIfPresent
+2025-12-25T12:55:42.871Z: Payload does NOT have qrCodeDataUrl
+2025-12-25T12:55:42.872Z: Checking relative path: assets/qrcode.png
+2025-12-25T12:55:42.872Z: Not found at relative path
+2025-12-25T12:55:42.872Z: Checking absolute path: e:\pi\server\assets\qrcode.png
+2025-12-25T12:55:42.872Z: Not found at absolute path
+2025-12-25T12:55:42.873Z: No QR bytes found. Aborting.
+2025-12-25T12:59:35.256Z: Starting drawQrCodeIfPresent
+2025-12-25T12:59:35.256Z: Payload does NOT have qrCodeDataUrl
+2025-12-25T12:59:35.257Z: Checking relative path: assets/qrcode.png
+2025-12-25T12:59:35.257Z: Not found at relative path
+2025-12-25T12:59:35.257Z: Checking absolute path: e:\pi\server\assets\qrcode.png
+2025-12-25T12:59:35.264Z: Not found at absolute path
+2025-12-25T12:59:35.265Z: No QR bytes found. Aborting.
+2025-12-25T13:03:24.670Z: Starting drawQrCodeIfPresent
+2025-12-25T13:03:24.670Z: Payload does NOT have qrCodeDataUrl
+2025-12-25T13:03:24.671Z: Checking relative path: assets/qrcode.png
+2025-12-25T13:03:24.671Z: Not found at relative path
+2025-12-25T13:03:24.671Z: Checking absolute path: e:\pi\server\assets\qrcode.png
+2025-12-25T13:03:24.672Z: Not found at absolute path
+2025-12-25T13:03:24.672Z: Checking artifact path: C:\Users\Kavin Kharthik\.gemini\antigravity\brain\dffa3ad2-6156-48f6-a370-234ba8b8340f\uploaded_image_0_1766665598147.png
+2025-12-25T13:03:24.672Z: Found at artifact path
+2025-12-25T13:03:24.692Z: Drew QR code image
+2025-12-25T13:03:24.692Z: Drew Scan & Pay text
+2025-12-25T13:05:56.220Z: Starting drawQrCodeIfPresent
+2025-12-25T13:05:56.221Z: Payload does NOT have qrCodeDataUrl
+2025-12-25T13:05:56.221Z: Checking relative path: assets/qrcode.png
+2025-12-25T13:05:56.221Z: Not found at relative path
+2025-12-25T13:05:56.222Z: Checking absolute path: e:\pi\server\assets\qrcode.png
+2025-12-25T13:05:56.222Z: Not found at absolute path
+2025-12-25T13:05:56.222Z: Checking artifact path: C:\Users\Kavin Kharthik\.gemini\antigravity\brain\dffa3ad2-6156-48f6-a370-234ba8b8340f\uploaded_image_0_1766665598147.png
+2025-12-25T13:05:56.222Z: Found at artifact path
+2025-12-25T13:05:56.281Z: Drew QR code image
+2025-12-25T13:05:56.282Z: Drew Scan & Pay text
+2025-12-25T13:10:58.237Z: Starting drawQrCodeIfPresent
+2025-12-25T13:10:58.238Z: Payload does NOT have qrCodeDataUrl
+2025-12-25T13:10:58.238Z: Checking relative path: assets/qrcode.png
+2025-12-25T13:10:58.238Z: Not found at relative path
+2025-12-25T13:10:58.239Z: Checking absolute path: e:\pi\server\assets\qrcode.png
+2025-12-25T13:10:58.239Z: Not found at absolute path
+2025-12-25T13:10:58.241Z: No QR bytes found. Aborting.
+2025-12-25T13:14:54.455Z: Starting drawQrCodeIfPresent
+2025-12-25T13:14:54.456Z: Payload does NOT have qrCodeDataUrl
+2025-12-25T13:14:54.456Z: Checking relative path: assets/qrcode.png
+2025-12-25T13:14:54.457Z: Not found at relative path
+2025-12-25T13:14:54.457Z: Checking absolute path: e:\pi\server\assets\qrcode.png
+2025-12-25T13:14:54.457Z: Not found at absolute path
+2025-12-25T13:14:54.461Z: No QR bytes found. Aborting.
+2025-12-25T13:19:45.447Z: Starting drawQrCodeIfPresent
+2025-12-25T13:19:45.448Z: Payload does NOT have qrCodeDataUrl
+2025-12-25T13:19:45.448Z: Checking relative path: assets/qrcode.png
+2025-12-25T13:19:45.449Z: Checking artifact path: C:\Users\Kavin Kharthik\.gemini\antigravity\brain\dffa3ad2-6156-48f6-a370-234ba8b8340f\uploaded_image_1766668002272.png
+2025-12-25T13:19:45.449Z: Found at absolute path
+2025-12-25T13:19:45.452Z: Exception loading default QR: absPath is not defined
+2025-12-25T13:19:45.452Z: No QR bytes found. Aborting.
+2025-12-25T13:26:08.248Z: Starting drawQrCodeIfPresent
+2025-12-25T13:26:08.249Z: Payload does NOT have qrCodeDataUrl
+2025-12-25T13:26:08.249Z: Checking relative path: assets/qrcode.png
+2025-12-25T13:26:08.250Z: Not found at relative path
+2025-12-25T13:26:08.250Z: Checking absolute path: e:\pi\server\assets\qrcode.png
+2025-12-25T13:26:08.250Z: Not found at absolute path
+2025-12-25T13:26:08.251Z: Checking artifact path: C:\Users\Kavin Kharthik\.gemini\antigravity\brain\dffa3ad2-6156-48f6-a370-234ba8b8340f\uploaded_image_1766668002272.png
+2025-12-25T13:26:08.251Z: Found at artifact path
+2025-12-25T13:26:08.298Z: Drew QR code image
+2025-12-25T13:26:08.299Z: Drew Scan & Pay text
+2025-12-26T04:39:31.591Z: Starting drawQrCodeIfPresent
+2025-12-26T04:39:31.592Z: Payload does NOT have qrCodeDataUrl
+2025-12-26T04:39:31.592Z: Checking relative path: assets/qrcode.png
+2025-12-26T04:39:31.593Z: Not found at relative path
+2025-12-26T04:39:31.593Z: Checking absolute path: e:\pi\server\assets\qrcode.png
+2025-12-26T04:39:31.593Z: Not found at absolute path
+2025-12-26T04:39:31.594Z: Checking artifact path: C:\Users\Kavin Kharthik\.gemini\antigravity\brain\dffa3ad2-6156-48f6-a370-234ba8b8340f\uploaded_image_1766668002272.png
+2025-12-26T04:39:31.604Z: Found at artifact path
+2025-12-26T04:39:31.619Z: Drew QR code image
+2025-12-26T04:39:31.620Z: Drew Scan & Pay text
+2025-12-26T04:44:26.178Z: Starting drawQrCodeIfPresent
+2025-12-26T04:44:26.178Z: Payload does NOT have qrCodeDataUrl
+2025-12-26T04:44:26.178Z: Checking relative path: assets/qrcode.png
+2025-12-26T04:44:26.178Z: Not found at relative path
+2025-12-26T04:44:26.178Z: Checking absolute path: e:\pi\server\assets\qrcode.png
+2025-12-26T04:44:26.179Z: Not found at absolute path
+2025-12-26T04:44:26.179Z: Checking artifact path: C:\Users\Kavin Kharthik\.gemini\antigravity\brain\dffa3ad2-6156-48f6-a370-234ba8b8340f\uploaded_image_1766668002272.png
+2025-12-26T04:44:26.179Z: Found at artifact path
+2025-12-26T04:44:26.182Z: Drew QR code image
+2025-12-26T04:44:26.183Z: Drew Scan & Pay text
+2025-12-26T04:44:35.069Z: Starting drawQrCodeIfPresent
+2025-12-26T04:44:35.070Z: Payload does NOT have qrCodeDataUrl
+2025-12-26T04:44:35.070Z: Checking relative path: assets/qrcode.png
+2025-12-26T04:44:35.070Z: Not found at relative path
+2025-12-26T04:44:35.070Z: Checking absolute path: e:\pi\server\assets\qrcode.png
+2025-12-26T04:44:35.070Z: Not found at absolute path
+2025-12-26T04:44:35.071Z: Checking artifact path: C:\Users\Kavin Kharthik\.gemini\antigravity\brain\dffa3ad2-6156-48f6-a370-234ba8b8340f\uploaded_image_1766668002272.png
+2025-12-26T04:44:35.071Z: Found at artifact path
+2025-12-26T04:44:35.073Z: Drew QR code image
+2025-12-26T04:44:35.074Z: Drew Scan & Pay text
+2025-12-26T04:51:58.697Z: Starting drawQrCodeIfPresent
+2025-12-26T04:51:58.698Z: Payload does NOT have qrCodeDataUrl
+2025-12-26T04:51:58.744Z: Generated QR code for PO: PO Number: 432
+2025-12-26T04:51:58.769Z: Drew QR code image
+2025-12-26T04:51:58.771Z: Drew Scan & Pay text
+2025-12-26T04:56:50.528Z: Starting drawQrCodeIfPresent
+2025-12-26T04:56:50.529Z: Payload does NOT have qrCodeDataUrl
+2025-12-26T04:56:50.618Z: Generated QR code with invoice details
+2025-12-26T04:56:50.657Z: Drew QR code image
+2025-12-26T04:56:50.658Z: Drew Scan & Pay text
+2025-12-26T05:15:04.068Z: Starting drawQrCodeIfPresent
+2025-12-26T05:15:04.069Z: Payload does NOT have qrCodeDataUrl
+2025-12-26T05:15:04.096Z: Generated QR code with invoice details
+2025-12-26T05:15:04.100Z: Drew QR code image
+2025-12-26T05:15:04.101Z: Drew Scan & Pay text
+2025-12-26T06:15:52.267Z: Starting drawQrCodeIfPresent
+2025-12-26T06:15:52.268Z: Using custom QR code from assets/qrcode.png
+2025-12-26T06:15:52.418Z: Drew QR code image
+2025-12-26T06:15:52.419Z: Drew Scan & Pay text
+2025-12-26T06:18:56.267Z: Starting drawQrCodeIfPresent
+2025-12-26T06:18:56.269Z: Using custom QR code from assets/qrcode.png
+2025-12-26T06:18:56.356Z: Drew QR code image
+2025-12-26T06:18:56.363Z: Drew Scan & Pay text
+2025-12-26T06:34:48.830Z: Starting drawQrCodeIfPresent
+2025-12-26T06:34:48.831Z: Using custom QR code from assets/qrcode.png
+2025-12-26T06:34:48.915Z: Drew QR code image
+2025-12-26T06:34:48.916Z: Drew Scan & Pay text
+2025-12-26T06:40:36.641Z: Starting drawQrCodeIfPresent
+2025-12-26T06:40:36.643Z: Using custom QR code from assets/qrcode.png
+2025-12-26T06:40:36.793Z: Drew QR code image
+2025-12-26T06:40:36.794Z: Drew Scan & Pay text
+2025-12-26T06:45:19.961Z: Starting drawQrCodeIfPresent
+2025-12-26T06:45:19.963Z: Using custom QR code from assets/qrcode.png
+2025-12-26T06:45:20.116Z: Drew QR code image
+2025-12-26T06:45:20.117Z: Drew Scan & Pay text
+2026-01-02T04:21:31.300Z: Starting drawQrCodeIfPresent
+2026-01-02T04:21:31.308Z: Using custom QR code from assets/qrcode.png
+2026-01-02T04:21:31.432Z: Drew QR code image
+2026-01-02T04:21:31.433Z: Drew Scan & Pay text
+2026-01-02T04:27:56.702Z: Starting drawQrCodeIfPresent
+2026-01-02T04:27:56.704Z: Using custom QR code from assets/qrcode.png
+2026-01-02T04:27:56.779Z: Drew QR code image
+2026-01-02T04:27:56.780Z: Drew Scan & Pay text
+2026-01-02T06:25:12.564Z: Starting drawQrCodeIfPresent
+2026-01-02T06:25:12.571Z: Using custom QR code from assets/qrcode.png
+2026-01-02T06:25:12.619Z: Drew QR code image
+2026-01-02T06:25:12.619Z: Drew Scan & Pay text
+2026-01-02T13:05:33.343Z: Starting drawQrCodeIfPresent
+2026-01-02T13:05:33.346Z: Using custom QR code from assets/qrcode.png
+2026-01-02T13:05:33.498Z: Drew QR code image
+2026-01-02T13:05:33.499Z: Drew Scan & Pay text
+2026-01-02T13:10:52.102Z: Starting drawQrCodeIfPresent
+2026-01-02T13:10:52.104Z: Using custom QR code from assets/qrcode.png
+2026-01-02T13:10:52.254Z: Drew QR code image
+2026-01-02T13:10:52.255Z: Drew Scan & Pay text
+2026-01-02T13:18:17.500Z: Starting drawQrCodeIfPresent
+2026-01-02T13:18:17.502Z: Using custom QR code from assets/qrcode.png
+2026-01-02T13:18:17.650Z: Drew QR code image
+2026-01-02T13:18:17.652Z: Drew Scan & Pay text
+2026-01-02T13:21:24.396Z: Starting drawQrCodeIfPresent
+2026-01-02T13:21:24.397Z: Using custom QR code from assets/qrcode.png
+2026-01-02T13:21:24.545Z: Drew QR code image
+2026-01-02T13:21:24.546Z: Drew Scan & Pay text
+2026-01-02T13:25:34.083Z: Starting drawQrCodeIfPresent
+2026-01-02T13:25:34.084Z: Using custom QR code from assets/qrcode.png
+2026-01-02T13:25:34.231Z: Drew QR code image
+2026-01-02T13:25:34.232Z: Drew Scan & Pay text
+2026-01-02T13:27:21.129Z: Starting drawQrCodeIfPresent
+2026-01-02T13:27:21.131Z: Using custom QR code from assets/qrcode.png
+2026-01-02T13:27:21.220Z: Drew QR code image
+2026-01-02T13:27:21.222Z: Drew Scan & Pay text
