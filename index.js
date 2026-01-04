@@ -739,7 +739,8 @@ async function generateProformaInvoice(payload) {
   const footerY = calculatedFooterY;
   const terms = [
     "• Payments are to be made by A/C Payee's cheque or DD payable at Tirupur",
-    "• Claims of any nature whatsoever will lapse unless raised in writing within 5 days from the date of invoice",
+    "• Claims of any nature whatsoever will lapse unless raised in writing",
+    "  within 5 days from the date of invoice",
     "• Interest will be charged @ 24% from the date of Invoice.",
     "• Subject to Tirupur Jurisdiction.",
   ];
