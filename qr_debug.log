@@ -184,3 +184,15 @@
 2026-01-04T15:30:08.587Z: Using custom QR code from assets/qrcode.png
 2026-01-04T15:30:08.610Z: Drew QR code image
 2026-01-04T15:30:08.611Z: Drew Scan & Pay text
+2026-01-05T09:20:03.804Z: Starting drawQrCodeIfPresent
+2026-01-05T09:20:03.814Z: Using custom QR code from assets/qrcode.png
+2026-01-05T09:20:03.969Z: Drew QR code image
+2026-01-05T09:20:03.970Z: Drew Scan & Pay text
+2026-01-05T09:33:27.899Z: Starting drawQrCodeIfPresent
+2026-01-05T09:33:27.901Z: Using custom QR code from assets/qrcode.png
+2026-01-05T09:33:28.006Z: Drew QR code image
+2026-01-05T09:33:28.008Z: Drew Scan & Pay text
+2026-01-05T13:17:18.369Z: Starting drawQrCodeIfPresent
+2026-01-05T13:17:18.372Z: Using custom QR code from assets/qrcode.png
+2026-01-05T13:17:18.468Z: Drew QR code image
+2026-01-05T13:17:18.469Z: Drew Scan & Pay text

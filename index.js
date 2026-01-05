@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { TransactionalEmailsApi, SendSmtpEmail } from "@getbrevo/brevo";
 import qrcode from "qrcode";
+import mongoose from "mongoose";
+import { Invoice } from "./models/Invoice.js";
 
 dotenv.config();
 
@@ -18,6 +20,21 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(cors());
 app.use(express.json({ limit: "5mb" }));
+
+// Connect to MongoDB
+const connectDB = async () => {
+  try {
+    if (!process.env.MONGO_URI) {
+      console.warn("⚠️ MONGO_URI not found in .env file. Database connection skipped.");
+      return;
+    }
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("MongoDB Connected");
+  } catch (err) {
+    console.error("MongoDB connection error:", err);
+  }
+};
+connectDB();
 
 // --- Layout configuration: bounding boxes and table geometry ---
 // NOTE: All coordinates are examples and must be fine-tuned against the real PDF.
@@ -848,6 +865,17 @@ app.post("/api/generate-pdf", async (req, res) => {
 
     const pdfBytes = await generateProformaInvoice(payload);
 
+    // Save to MongoDB
+    try {
+      if (mongoose.connection.readyState === 1) {
+        const invoice = new Invoice(payload);
+        await invoice.save();
+        console.log("Invoice saved to MongoDB:", invoice._id);
+      }
+    } catch (dbError) {
+      console.error("Failed to save invoice to MongoDB:", dbError);
+    }
+
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="proforma-invoice-${payload.poNumber || Date.now()}.pdf"`);
     res.send(Buffer.from(pdfBytes));
@@ -895,6 +923,17 @@ app.post("/api/generate-and-email-pdf", async (req, res) => {
     }
 
     const pdfBytes = await generateProformaInvoice(payload);
+
+    // Save to MongoDB
+    try {
+      if (mongoose.connection.readyState === 1) {
+        const invoice = new Invoice(payload);
+        await invoice.save();
+        console.log("Invoice saved to MongoDB:", invoice._id);
+      }
+    } catch (dbError) {
+      console.error("Failed to save invoice to MongoDB:", dbError);
+    }
 
     // Email configuration validation
     if (!process.env.BREVO_API_KEY) {
