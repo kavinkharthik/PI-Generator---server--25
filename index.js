@@ -183,17 +183,17 @@ async function generateProformaInvoice(payload) {
     borderWidth: 1,
   });
 
-  // Professional blue header band
-  const headerHeight = 120;
-  const blueColor = rgb(0.1, 0.3, 0.6); // Professional blue color
-  const lightBlueColor = rgb(0.7, 0.85, 0.95); // Light blue for accents
-  const whiteColor = rgb(1, 1, 1); // White color
-  const darkBlueColor = rgb(0.05, 0.2, 0.4); // Dark blue for text
+  // Professional Premium Corporate Theme
+  const headerHeight = 130;
+  const blueColor = rgb(0, 0.2, 0.4); // Deep Navy Blue (#003366)
+  const lightBlueColor = rgb(0.95, 0.96, 0.98); // Very light blue/gray
+  const whiteColor = rgb(1, 1, 1);
+  const darkBlueColor = rgb(0, 0.1, 0.2); // Almost black
   const logoBox = {
-    x: 20,
-    y: height - headerHeight + 15,
-    width: 90,
-    height: 90,
+    x: 30,
+    y: height - headerHeight + 25,
+    width: 80,
+    height: 80,
   };
 
   async function drawQrCodeIfPresent() {
@@ -312,6 +312,7 @@ async function generateProformaInvoice(payload) {
     page.drawImage(img, { x: dx, y: dy, width: iw, height: ih });
   }
 
+  // Header Band
   page.drawRectangle({
     x: 0,
     y: height - headerHeight,
@@ -320,301 +321,242 @@ async function generateProformaInvoice(payload) {
     color: blueColor,
   });
 
-  // Logo area (left side of blue band)
+  // Logo Container (White Box)
   page.drawRectangle({
-    x: logoBox.x,
-    y: logoBox.y,
-    width: logoBox.width,
-    height: logoBox.height,
-    borderColor: lightBlueColor,
-    borderWidth: 2,
+    x: logoBox.x - 5,
+    y: logoBox.y - 5,
+    width: logoBox.width + 10,
+    height: logoBox.height + 10,
     color: whiteColor,
   });
   await drawLogoIfPresent();
 
-  // Text block to the right of the logo (like reference heading)
-  const textLeft = logoBox.x + logoBox.width + 20;
-  const textMaxWidth = width - textLeft - 20;
-  let currentY = height - 50;
-
+  // Company Name
+  const textLeft = logoBox.x + logoBox.width + 30;
   const companyName = "SRI CHAKRI TRADERS";
   page.drawText(companyName, {
     x: textLeft,
-    y: currentY,
-    size: headerFontSize,
+    y: height - 50,
+    size: 24, // Larger and bolder
     font: boldFont,
     color: whiteColor,
   });
 
-  // Address
-  currentY -= 24;
+  // Address Details (Lighter text for hierarchy)
+  let addrY = height - 75;
+  const addrColor = rgb(0.9, 0.9, 0.9);
+
   const address = "222, C1, P.K.M.R. Nagar, Dharapuram Road, Tirupur-641 604";
-  page.drawText(address, {
-    x: textLeft,
-    y: currentY,
-    size: fontSize,
-    font: font,
-    color: whiteColor,
-    maxWidth: textMaxWidth,
-  });
+  page.drawText(address, { x: textLeft, y: addrY, size: 9, font: font, color: addrColor });
 
-  // Mobile
-  currentY -= 18;
+  addrY -= 14;
   const mobile = "Mobile no: 8072202136, 9976951369";
-  page.drawText(mobile, {
-    x: textLeft,
-    y: currentY,
-    size: fontSize,
-    font: font,
-    color: whiteColor,
-  });
+  page.drawText(mobile, { x: textLeft, y: addrY, size: 9, font: font, color: addrColor });
 
-  // Email
-  currentY -= 18;
+  addrY -= 14;
   const email = "srichakritraderstup@gmail.com";
-  page.drawText(email, {
-    x: textLeft,
-    y: currentY,
-    size: fontSize,
-    font: font,
-    color: whiteColor,
-  });
+  page.drawText(email, { x: textLeft, y: addrY, size: 9, font: font, color: addrColor });
 
-  // GST Number on right side of blue band
+  // GST (Top Right)
   const gstText = "GST No.: 33DMSPD3047K1ZV";
   page.drawText(gstText, {
-    x: width - 30 - font.widthOfTextAtSize(gstText, fontSize),
-    y: height - 50,
-    size: fontSize,
-    font: font,
-    color: whiteColor,
-  });
-
-  // PERFORMA INVOICE box in blue band
-  const invoiceBoxY = height - headerHeight + 10;
-  const invoiceBoxHeight = 25;
-  page.drawRectangle({
-    x: width - 150,
-    y: invoiceBoxY,
-    width: 130,
-    height: invoiceBoxHeight,
-    borderColor: whiteColor,
-    borderWidth: 1.5,
-    color: blueColor,
-  });
-  page.drawText("PERFORMA INVOICE", {
-    x: width - 145,
-    y: invoiceBoxY + 7,
-    size: fontSize,
+    x: width - 30 - boldFont.widthOfTextAtSize(gstText, 10),
+    y: height - 30,
+    size: 10,
     font: boldFont,
     color: whiteColor,
   });
 
-  currentY = height - headerHeight - 20;
+  // "PROFORMA INVOICE" Badge
+  const invoiceBoxY = height - headerHeight + 15;
+  const invoiceBoxHeight = 25;
+  const titleText = "PROFORMA INVOICE";
+  const titleWidth = boldFont.widthOfTextAtSize(titleText, 12);
 
-  // Horizontal line separator
-  page.drawLine({
-    start: { x: 0, y: currentY },
-    end: { x: width, y: currentY },
-    thickness: 1,
-    color: rgb(0, 0, 0),
+  page.drawRectangle({
+    x: width - 160,
+    y: invoiceBoxY,
+    width: 140,
+    height: invoiceBoxHeight,
+    borderColor: whiteColor,
+    borderWidth: 1,
+    color: blueColor, // Transparent/Blue
+  });
+  page.drawText(titleText, {
+    x: width - 160 + (140 - titleWidth) / 2,
+    y: invoiceBoxY + 7,
+    size: 12,
+    font: boldFont,
+    color: whiteColor,
   });
 
-  currentY -= 25;
+  currentY = height - headerHeight - 40;
 
-  // To section - left aligned
-  const receiverName = payload.receiverName || "";
-  page.drawText("To. M/s.", { x: 50, y: currentY, size: fontSize, font: font });
-  page.drawText(receiverName, { x: 120, y: currentY, size: fontSize, font: font });
+  // Left Column: Receiver
+  page.drawText("Bill To:", { x: 40, y: currentY, size: 10, font: boldFont, color: blueColor });
+  currentY -= 15;
+  page.drawText(payload.receiverName || "", { x: 40, y: currentY, size: 11, font: boldFont });
+  currentY -= 15;
+  // Multiline address
+  const addrBox = { x: 40, y: currentY - 35, width: 250, height: 40, lineHeight: 12, maxLines: 3 };
+  drawMultilineBox(page, font, payload.receiverAddress || "", 9, addrBox);
 
-  // Right side - Order By
-  const orderBy = payload.orderBy || "VOLTA FASHIONS";
-  page.drawText(`Order By: ${orderBy}`, { x: 350, y: currentY, size: fontSize, font: font });
+  // Right Column: Invoice Details
+  const rightColX = 350;
+  let infoY = height - headerHeight - 40;
 
-  currentY -= 20;
-  // Mobile numbers on same line
-  const phone = payload.receiverPhone || "";
-  page.drawText(`Mobile no: ${phone}`, { x: 350, y: currentY, size: fontSize, font: font });
-  page.drawText(`Mobile no: ${phone}`, { x: 480, y: currentY, size: fontSize, font: font });
-
-  currentY -= 20;
-  // PI Date and Date on same line
   let piDate = payload.piDate || payload.poDate || new Date().toISOString().split('T')[0];
-  // Convert YYYY-MM-DD to DD.MM.YYYY format
   if (piDate.includes('-')) {
     const [year, month, day] = piDate.split('-');
     piDate = `${day}.${month}.${year}`;
   }
-  page.drawText(`PI.Dt:${piDate}`, { x: 350, y: currentY, size: fontSize, font: font });
-  page.drawText(`Date: ${piDate}`, { x: 480, y: currentY, size: fontSize, font: font });
 
-  currentY -= 25;
+  const drawLabelVal = (label, val, y) => {
+    page.drawText(label, { x: rightColX, y: y, size: 9, font: boldFont, color: rgb(0.4, 0.4, 0.4) });
+    page.drawText(val, { x: rightColX + 80, y: y, size: 9, font: font });
+  };
 
-  // Table with borders
+  drawLabelVal("PO No:", payload.poNumber || "-", infoY);
+  infoY -= 18;
+  drawLabelVal("Date:", piDate, infoY);
+  infoY -= 18;
+  drawLabelVal("Order By:", payload.orderBy || "VOLTA FASHIONS", infoY);
+  infoY -= 18;
+  drawLabelVal("Transport:", payload.transportMode || "-", infoY);
+  infoY -= 18;
+  drawLabelVal("Destination:", payload.destination || "-", infoY);
+
+  currentY = infoY - 30; // Gap before table
+
+  // TABLE
   const tableStartX = 30;
   const tableEndX = width - 30;
   const tableWidth = tableEndX - tableStartX;
-  const colWidths = { sNo: 40, particulars: 180, hsn: 80, dcNo: 70, rate: 80, qty: 70, amount: 65 };
+  const colWidths = { sNo: 35, particulars: 200, hsn: 60, dcNo: 60, rate: 65, qty: 50, amount: 70 };
   const totalColWidth = Object.values(colWidths).reduce((a, b) => a + b, 0);
   const colWidthsAdjusted = {};
-  Object.keys(colWidths).forEach((key, idx) => {
+  Object.keys(colWidths).forEach((key) => {
     colWidthsAdjusted[key] = (colWidths[key] / totalColWidth) * tableWidth;
   });
 
-  // Table border
-  const tableTopY = currentY + 15;
-  const tableHeaderHeight = 20;
+  const tableHeaderHeight = 25;
 
-  // Table headers with borders and background
-  const headers = ["S.No.", "Particulars", "HSN CODE", "D.C. No.", "Rate Rs.", "Quantity", "Amount"];
-  let headerX = tableStartX;
-
-  // Draw table border
+  // Header Background - Navy
   page.drawRectangle({
     x: tableStartX,
-    y: tableTopY - tableHeaderHeight,
+    y: currentY - tableHeaderHeight,
     width: tableWidth,
     height: tableHeaderHeight,
-    borderColor: rgb(0, 0, 0),
-    borderWidth: 1,
-    color: lightBlueColor, // Light blue background for header
+    color: blueColor,
   });
 
-  // Draw vertical lines for columns
-  let colX = tableStartX;
-  Object.values(colWidthsAdjusted).forEach((colWidth, idx) => {
-    if (idx > 0 && idx < Object.keys(colWidthsAdjusted).length) {
-      page.drawLine({
-        start: { x: colX, y: tableTopY },
-        end: { x: colX, y: tableTopY - tableHeaderHeight },
-        thickness: 0.5,
-        color: rgb(0, 0, 0),
-      });
-    }
-    colX += colWidth;
-  });
-
-  // Header text
-  headerX = tableStartX;
+  // Header Text
+  let headerX = tableStartX;
   headers.forEach((header, idx) => {
     const colWidth = Object.values(colWidthsAdjusted)[idx];
-    if (idx === 0) {
-      page.drawText(header, { x: headerX + 5, y: tableTopY - 12, size: smallFontSize, font: boldFont });
-    } else if (idx === 4 || idx === 6) {
-      const textWidth = boldFont.widthOfTextAtSize(header, smallFontSize);
-      page.drawText(header, { x: headerX + colWidth - textWidth - 5, y: tableTopY - 12, size: smallFontSize, font: boldFont });
-    } else {
-      page.drawText(header, { x: headerX + 5, y: tableTopY - 12, size: smallFontSize, font: boldFont });
-    }
+    const align = (idx === 4 || idx === 6) ? "right" : (idx === 0 ? "center" : "left");
+
+    const textW = boldFont.widthOfTextAtSize(header, 9);
+    let tx = headerX + 5;
+    if (align === "center") tx = headerX + (colWidth - textW) / 2;
+    if (align === "right") tx = headerX + colWidth - textW - 5;
+
+    page.drawText(header, { x: tx, y: currentY - 17, size: 9, font: boldFont, color: whiteColor });
     headerX += colWidth;
   });
 
-  currentY = tableTopY - tableHeaderHeight - 5;
+  currentY -= tableHeaderHeight;
 
-  // Table rows with borders
+  // Rows logic
   const items = Array.isArray(payload.items) ? payload.items : [];
   let total = 0;
-  const rowHeight = 20;
-  const maxRows = 12;
+  const rowH = 22;
 
-  items.slice(0, maxRows).forEach((item, index) => {
-    if (currentY < 280) return; // Stop if too low
+  // Loop 12 rows
+  for (let i = 0; i < 12; i++) {
+    if (currentY < 100) break;
 
-    const rate = Number(item.rate) || 0;
-    const qty = Number(item.quantity) || 0;
-    const amount = rate * qty;
-    total += amount;
+    const item = items[i] || {};
+    const isAlt = i % 2 !== 0; // Alternating
 
-    // Alternating row colors
-    const rowColor = index % 2 === 0 ? rgb(0.95, 0.95, 0.95) : whiteColor; // Light gray for even rows
+    if (isAlt) {
+      page.drawRectangle({
+        x: tableStartX,
+        y: currentY - rowH,
+        width: tableWidth,
+        height: rowH,
+        color: lightBlueColor
+      });
+    }
 
-    // Draw row border
-    page.drawRectangle({
-      x: tableStartX,
-      y: currentY - rowHeight,
-      width: tableWidth,
-      height: rowHeight,
-      borderColor: rgb(0, 0, 0),
-      borderWidth: 0.5,
-      color: rowColor,
+    if (items[i]) {
+      const rate = Number(item.rate) || 0;
+      const qty = Number(item.quantity) || 0;
+      const amount = rate * qty;
+      total += amount;
+
+      const rowData = [
+        String(i + 1),
+        item.particulars || "",
+        item.hsn || "",
+        item.dcNo || "",
+        rate > 0 ? rate.toFixed(2) : "",
+        qty > 0 ? qty.toString() : "",
+        amount > 0 ? amount.toFixed(2) : "",
+      ];
+
+      let cx = tableStartX;
+      rowData.forEach((txt, idx) => {
+        const cw = Object.values(colWidthsAdjusted)[idx];
+        const align = (idx === 4 || idx === 6) ? "right" : (idx === 0 || idx === 5 ? "center" : "left");
+
+        const tw = font.widthOfTextAtSize(txt, 9);
+        let tx = cx + 5;
+        if (align === "center") tx = cx + (cw - tw) / 2;
+        if (align === "right") tx = cx + cw - tw - 5;
+
+        const textColor = rgb(0.2, 0.2, 0.2);
+        const clipped = clipTextToWidth(txt, font, 9, cw - 8);
+        page.drawText(clipped || "", { x: tx, y: currentY - 15, size: 9, font: font, color: textColor });
+        cx += cw;
+      });
+    }
+
+    // Bottom border for row
+    page.drawLine({
+      start: { x: tableStartX, y: currentY - rowH },
+      end: { x: tableEndX, y: currentY - rowH },
+      thickness: 0.5,
+      color: rgb(0.85, 0.85, 0.85)
     });
 
-    // Draw vertical lines
-    let colX = tableStartX;
-    Object.values(colWidthsAdjusted).forEach((colWidth, idx) => {
-      if (idx > 0 && idx < Object.keys(colWidthsAdjusted).length) {
-        page.drawLine({
-          start: { x: colX, y: currentY },
-          end: { x: colX, y: currentY - rowHeight },
-          thickness: 0.5,
-          color: rgb(0, 0, 0),
-        });
-      }
-      colX += colWidth;
-    });
+    currentY -= rowH;
+  }
 
-    let rowX = tableStartX;
-    const rowData = [
-      String(index + 1),
-      item.particulars || "",
-      item.hsn || "",
-      item.dcNo || "",
-      rate > 0 ? rate.toFixed(2) : "",
-      qty > 0 ? qty.toString() : "",
-      amount > 0 ? amount.toFixed(2) : "",
-    ];
-
-    rowData.forEach((data, idx) => {
-      const colWidth = Object.values(colWidthsAdjusted)[idx];
-      if (idx === 0) {
-        const textWidth = font.widthOfTextAtSize(data, smallFontSize);
-        page.drawText(data, { x: rowX + colWidth / 2 - textWidth / 2, y: currentY - 12, size: smallFontSize, font: font });
-      } else if (idx === 4 || idx === 6) {
-        const textWidth = font.widthOfTextAtSize(data, smallFontSize);
-        page.drawText(data, { x: rowX + colWidth - textWidth - 5, y: currentY - 12, size: smallFontSize, font: font });
-      } else if (idx === 5) {
-        const textWidth = font.widthOfTextAtSize(data, smallFontSize);
-        page.drawText(data, { x: rowX + colWidth / 2 - textWidth / 2, y: currentY - 12, size: smallFontSize, font: font });
-      } else {
-        page.drawText(data, { x: rowX + 5, y: currentY - 12, size: smallFontSize, font: font });
-      }
-      rowX += colWidth;
-    });
-
-    currentY -= rowHeight;
+  // Outer Border for Table Body
+  const tableBodyHeight = 12 * rowH;
+  page.drawRectangle({
+    x: tableStartX,
+    y: currentY,
+    width: tableWidth,
+    height: tableBodyHeight,
+    borderColor: blueColor,
+    borderWidth: 1,
   });
 
-  // Draw empty rows if needed
-  const emptyRows = maxRows - items.length;
-  for (let i = 0; i < emptyRows && currentY > 280; i++) {
-    const rowIndex = items.length + i;
-    const rowColor = rowIndex % 2 === 0 ? rgb(0.95, 0.95, 0.95) : whiteColor;
-
-    page.drawRectangle({
-      x: tableStartX,
-      y: currentY - rowHeight,
-      width: tableWidth,
-      height: rowHeight,
-      borderColor: rgb(0, 0, 0),
-      borderWidth: 0.5,
-      color: rowColor,
-    });
-
-    let colX = tableStartX;
-    Object.values(colWidthsAdjusted).forEach((colWidth, idx) => {
-      if (idx > 0 && idx < Object.keys(colWidthsAdjusted).length) {
-        page.drawLine({
-          start: { x: colX, y: currentY },
-          end: { x: colX, y: currentY - rowHeight },
-          thickness: 0.5,
-          color: rgb(0, 0, 0),
-        });
-      }
-      colX += colWidth;
-    });
-
-    currentY -= rowHeight;
-  }
+  // Vertical lines (light)
+  let vx = tableStartX;
+  Object.values(colWidthsAdjusted).forEach((cw, k) => {
+    if (k > 0) {
+      page.drawLine({
+        start: { x: vx, y: currentY + tableBodyHeight },
+        end: { x: vx, y: currentY },
+        thickness: 0.5,
+        color: rgb(0.9, 0.9, 0.9)
+      });
+    }
+    vx += cw;
+  });
 
   currentY -= 20;
 
@@ -806,9 +748,7 @@ async function generateProformaInvoice(payload) {
   // Draw QR Code
   await drawQrCodeIfPresent();
 
-  // Professional gray footer band
-  const grayColor = rgb(0.9, 0.9, 0.9); // Light gray color
-  const darkGrayColor = rgb(0.3, 0.3, 0.3); // Dark gray for text
+  // Professional Navy Footer Band
   const footerHeight = 50;
 
   page.drawRectangle({
@@ -816,14 +756,14 @@ async function generateProformaInvoice(payload) {
     y: 0,
     width: width,
     height: footerHeight,
-    color: grayColor,
+    color: blueColor, // Use the Navy color
   });
 
-  // Additional note in gray footer
+  // Note Text - White
   const noteY = 35;
-  page.drawText("FOR YOUR KIND ATTENTION:", { x: 30, y: noteY, size: smallFontSize, font: boldFont, color: darkGrayColor });
-  page.drawText("payment must be within 30 days from the despatch day.( Pay by cheque)", { x: 30, y: noteY - 15, size: smallFontSize, font: font, color: darkGrayColor });
-  page.drawText("AFTER RECEIVING THE PI , PLEASE SEND POST DATED CHEQUE", { x: 30, y: noteY - 30, size: smallFontSize, font: font, color: darkGrayColor });
+  page.drawText("FOR YOUR KIND ATTENTION:", { x: 30, y: noteY, size: smallFontSize, font: boldFont, color: whiteColor });
+  page.drawText("payment must be within 30 days from the despatch day.( Pay by cheque)", { x: 30, y: noteY - 15, size: smallFontSize, font: font, color: whiteColor });
+  page.drawText("AFTER RECEIVING THE PI , PLEASE SEND POST DATED CHEQUE", { x: 30, y: noteY - 30, size: smallFontSize, font: font, color: whiteColor });
 
   return await pdfDoc.save();
 }
