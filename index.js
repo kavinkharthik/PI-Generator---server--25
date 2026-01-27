@@ -172,6 +172,7 @@ async function generateProformaInvoice(payload) {
   const fontSize = 10;
   const smallFontSize = 8;
   const headerFontSize = 20;
+  let currentY = 0;
 
   // Add a professional border around the entire document
   page.drawRectangle({
@@ -321,14 +322,7 @@ async function generateProformaInvoice(payload) {
     color: blueColor,
   });
 
-  // Logo Container (White Box)
-  page.drawRectangle({
-    x: logoBox.x - 5,
-    y: logoBox.y - 5,
-    width: logoBox.width + 10,
-    height: logoBox.height + 10,
-    color: whiteColor,
-  });
+  // Draw Logo (No box)
   await drawLogoIfPresent();
 
   // Company Name
@@ -439,6 +433,7 @@ async function generateProformaInvoice(payload) {
     colWidthsAdjusted[key] = (colWidths[key] / totalColWidth) * tableWidth;
   });
 
+  const headers = ["S.No", "Particulars", "HSN Code", "D.C. No", "Rate", "Quantity", "Amount"];
   const tableHeaderHeight = 25;
 
   // Header Background - Navy
@@ -560,11 +555,11 @@ async function generateProformaInvoice(payload) {
 
   currentY -= 20;
 
-  // Totals section with borders - right side
+  // Totals section - Redesigned
   const totalsStartX = width - 200;
   const totalsWidth = 170;
   const totalsStartY = currentY + 10;
-  const totalsRowHeight = 18;
+  const totalsRowHeight = 20; // Increased breathing room
   const numTotalsRows = 7;
   const totalsHeight = numTotalsRows * totalsRowHeight;
 
@@ -582,120 +577,42 @@ async function generateProformaInvoice(payload) {
 
   const igstLabel = igstRate > 0 ? `IGST ${igstRate}%` : "IGST 12%";
 
-  // Draw totals table border
-  page.drawRectangle({
-    x: totalsStartX,
-    y: totalsStartY - totalsHeight,
-    width: totalsWidth,
-    height: totalsHeight,
-    borderColor: rgb(0, 0, 0),
-    borderWidth: 1,
-  });
-
-  // Rupees field on left side
+  // "Amount Chargeable" on left side - Cleaner Look
   const rupeesFieldX = 30;
-  const rupeesFieldY = totalsStartY - 60;
-  const rupeesFieldWidth = 150;
-  const rupeesFieldHeight = 80;
-  page.drawRectangle({
-    x: rupeesFieldX,
-    y: rupeesFieldY - rupeesFieldHeight,
-    width: rupeesFieldWidth,
-    height: rupeesFieldHeight,
-    borderColor: rgb(0.8, 0.8, 0.8),
-    borderWidth: 1,
-  });
-
-  // Decorative header for Rupees box
-  page.drawRectangle({
-    x: rupeesFieldX,
-    y: rupeesFieldY - 25,
-    width: rupeesFieldWidth,
-    height: 25,
-    color: rgb(0.9, 0.9, 0.9), // Slightly darker gray for header
-  });
+  const rupeesFieldY = totalsStartY - 20;
+  const rupeesFieldWidth = 300;
 
   const rupeesLabel = "Amount Chargeable (in words):";
-  page.drawText(rupeesLabel, { x: rupeesFieldX + 5, y: rupeesFieldY - 17, size: smallFontSize, font: boldFont });
-
-  const rupeesText = numberToWords(roundedGrand);
-
-  // Use italic font if available, else standard font
-  const wordFont = (typeof italicFont !== 'undefined') ? italicFont : font;
-
-  drawMultilineBox(page, wordFont, rupeesText, smallFontSize, {
-    x: rupeesFieldX + 5,
-    y: rupeesFieldY - 80, // Bottom of the box area
-    width: rupeesFieldWidth - 10,
-    height: 50, // Available height in the white part
-    lineHeight: 12,
-    maxLines: 4
+  page.drawText(rupeesLabel, {
+    x: rupeesFieldX,
+    y: rupeesFieldY,
+    size: smallFontSize,
+    font: boldFont,
+    color: rgb(0.3, 0.3, 0.3)
   });
 
+  const rupeesText = numberToWords(roundedGrand);
+  const wordFont = (typeof italicFont !== 'undefined') ? italicFont : font;
+
+  // Draw Line under label
+  page.drawLine({
+    start: { x: rupeesFieldX, y: rupeesFieldY - 5 },
+    end: { x: rupeesFieldX + rupeesFieldWidth, y: rupeesFieldY - 5 },
+    thickness: 0.5,
+    color: rgb(0.8, 0.8, 0.8)
+  });
+
+  const textHeight = drawMultilineBox(page, wordFont, rupeesText, 10, {
+    x: rupeesFieldX,
+    y: rupeesFieldY - 20 - 40, // Adjust Y
+    width: rupeesFieldWidth,
+    height: 40,
+    lineHeight: 14,
+    maxLines: 3
+  });
 
   // Footer terms - left side
-  // Increase spacing from current Y to footer terms
-  // currentY was calculated earlier, but let's reset it relative to the lowest element (Rupees box or Totals)
-
-  const rupeesBoxBottomY = rupeesFieldY - rupeesFieldHeight;
-  const totalsBoxBottomY = totalsStartY - totalsHeight;
-  const lowestBoxY = Math.min(rupeesBoxBottomY, totalsBoxBottomY);
-
-  const calculatedFooterY = lowestBoxY - 30; // 30px gap
-
-  let totalsY = totalsStartY - 15;
-  const labelX = totalsStartX + 5;
-  const valueX = totalsStartX + totalsWidth - 10;
-
-  // TOTAL
-  page.drawText("TOTAL", { x: labelX, y: totalsY, size: smallFontSize, font: font });
-  const totalWidth = font.widthOfTextAtSize(total.toFixed(2), smallFontSize);
-  page.drawText(total.toFixed(2), { x: valueX - totalWidth, y: totalsY, size: smallFontSize, font: font });
-  totalsY -= totalsRowHeight;
-
-  // GST
-  page.drawText("GST", { x: labelX, y: totalsY, size: smallFontSize, font: font });
-  totalsY -= totalsRowHeight;
-
-  // CGST
-  page.drawText("CGST", { x: labelX, y: totalsY, size: smallFontSize, font: font });
-  if (cgst > 0) {
-    const cgstWidth = font.widthOfTextAtSize(cgst.toFixed(2), smallFontSize);
-    page.drawText(cgst.toFixed(2), { x: valueX - cgstWidth, y: totalsY, size: smallFontSize, font: font });
-  }
-  totalsY -= totalsRowHeight;
-
-  // SGST
-  page.drawText("SGST", { x: labelX, y: totalsY, size: smallFontSize, font: font });
-  if (sgst > 0) {
-    const sgstWidth = font.widthOfTextAtSize(sgst.toFixed(2), smallFontSize);
-    page.drawText(sgst.toFixed(2), { x: valueX - sgstWidth, y: totalsY, size: smallFontSize, font: font });
-  }
-  totalsY -= totalsRowHeight;
-
-  // IGST
-  page.drawText(igstLabel, { x: labelX, y: totalsY, size: smallFontSize, font: font });
-  if (igst > 0) {
-    const igstWidth = font.widthOfTextAtSize(igst.toFixed(2), smallFontSize);
-    page.drawText(igst.toFixed(2), { x: valueX - igstWidth, y: totalsY, size: smallFontSize, font: font });
-  }
-  totalsY -= totalsRowHeight;
-
-  // Rounded Off
-  page.drawText("Rounded Off", { x: labelX, y: totalsY, size: smallFontSize, font: font });
-  const roundedWidth = font.widthOfTextAtSize(roundedOff.toFixed(2), smallFontSize);
-  page.drawText(roundedOff.toFixed(2), { x: valueX - roundedWidth, y: totalsY, size: smallFontSize, font: font });
-  totalsY -= totalsRowHeight;
-
-  // GRAND TOTAL
-  page.drawText("GRAND TOTAL", { x: labelX, y: totalsY, size: fontSize, font: boldFont });
-  const grandWidth = boldFont.widthOfTextAtSize(roundedGrand.toFixed(2), fontSize);
-  page.drawText(roundedGrand.toFixed(2), { x: valueX - grandWidth, y: totalsY, size: fontSize, font: boldFont });
-
-  currentY = totalsStartY - totalsHeight - 20;
-
-  // Footer terms - left side
-  const footerY = calculatedFooterY;
+  const footerY = rupeesFieldY - 80;
   const terms = [
     "• Payments are to be made by A/C Payee's cheque or DD payable at Tirupur",
     "• Claims of any nature whatsoever will lapse unless raised in writing",
@@ -706,18 +623,18 @@ async function generateProformaInvoice(payload) {
 
   // Header for terms
   page.drawText("Terms & Conditions:", {
-    x: 50,
-    y: footerY + 15, // Slightly above the terms
-    size: smallFontSize + 1,
+    x: rupeesFieldX,
+    y: footerY,
+    size: 9, // Slightly larger
     font: boldFont,
-    underline: true
+    underline: true,
+    color: blueColor // Match theme
   });
 
-  let footerYPos = footerY;
-  const footerTermsWidth = width - 250; // Wrap before hitting the signature block (approx 200px from right)
+  let footerYPos = footerY - 15;
+  const footerTermsWidth = 220; // Reduced width to prevent overlap with QR Code
 
   terms.forEach((term) => {
-    // Manually wrap text
     const words = term.split(" ");
     let line = "";
     const lines = [];
@@ -734,16 +651,78 @@ async function generateProformaInvoice(payload) {
     lines.push(line);
 
     lines.forEach((l) => {
-      page.drawText(l.trim(), { x: 50, y: footerYPos, size: smallFontSize, font: font });
-      footerYPos -= 12; // Line height
+      page.drawText(l.trim(), { x: rupeesFieldX, y: footerYPos, size: smallFontSize, font: font, color: rgb(0.2, 0.2, 0.2) });
+      footerYPos -= 12;
     });
-    footerYPos -= 3; // Extra space between terms
+    footerYPos -= 3;
   });
 
-  // Signature - right side
-  page.drawText("For SRI CHAKRI TRADERS,", { x: width - 200, y: footerY, size: smallFontSize, font: font });
-  page.drawText("T.J. DURGA", { x: width - 200, y: footerY - 15, size: smallFontSize, font: font });
-  page.drawText("Authorised Signatory", { x: width - 200, y: footerY - 30, size: smallFontSize, font: font });
+  // Render Totals Table - Right Side
+  let totalsY = totalsStartY - 15;
+  const labelX = totalsStartX + 5;
+  const valueX = totalsStartX + totalsWidth - 10;
+
+  const drawTotalRow = (label, value, bold = false, bg = false) => {
+    // Row Background
+    if (bg) {
+      page.drawRectangle({
+        x: totalsStartX,
+        y: totalsY - 5,
+        width: totalsWidth,
+        height: totalsRowHeight,
+        color: blueColor,
+      });
+    }
+
+    // Top Border
+    page.drawLine({
+      start: { x: totalsStartX, y: totalsY + totalsRowHeight - 5 },
+      end: { x: totalsStartX + totalsWidth, y: totalsY + totalsRowHeight - 5 },
+      thickness: 0.5,
+      color: rgb(0.9, 0.9, 0.9)
+    });
+
+    const textColor = bg ? whiteColor : rgb(0.1, 0.1, 0.1);
+    const textFont = bold ? boldFont : font;
+    const size = bg ? 11 : 9;
+
+    page.drawText(label, { x: labelX, y: totalsY, size, font: textFont, color: textColor });
+
+    const valStr = value;
+    const valWidth = textFont.widthOfTextAtSize(valStr, size);
+    page.drawText(valStr, { x: valueX - valWidth, y: totalsY, size, font: textFont, color: textColor });
+
+    totalsY -= totalsRowHeight;
+  };
+
+  drawTotalRow("TOTAL", total.toFixed(2));
+  drawTotalRow("GST", ""); // Spacer or section header
+  drawTotalRow("CGST", cgst > 0 ? cgst.toFixed(2) : "0.00");
+  drawTotalRow("SGST", sgst > 0 ? sgst.toFixed(2) : "0.00");
+  drawTotalRow(igstLabel, igst > 0 ? igst.toFixed(2) : "0.00");
+  drawTotalRow("Rounded Off", roundedOff.toFixed(2));
+
+  // Grand Total - Highlighted
+  drawTotalRow("GRAND TOTAL", roundedGrand.toFixed(2), true, true);
+
+  // Bottom Border of Grand Total
+  page.drawRectangle({
+    x: totalsStartX,
+    y: totalsY + totalsRowHeight - 5, // Just below the grand total row
+    width: totalsWidth,
+    height: 1, // Thick line
+    color: blueColor
+  });
+
+
+  // Signature - Bottom Right
+  const signY = totalsY - 5;
+
+  page.drawText("For SRI CHAKRI TRADERS,", { x: width - 200, y: signY, size: 10, font: boldFont });
+  page.drawText("T.J. DURGA", { x: width - 200, y: signY - 20, size: 10, font: boldFont });
+  // Add space for signature
+  page.drawText("Authorised Signatory", { x: width - 200, y: signY - 40, size: 9, font: font, color: rgb(0.4, 0.4, 0.4) });
+
 
   // Draw QR Code
   await drawQrCodeIfPresent();
